@@ -1,0 +1,3 @@
+- zk 10.0.0-jakarta
+- jetty 12.0.23
+- dynamic reports 5.0.0
