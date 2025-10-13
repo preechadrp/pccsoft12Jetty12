@@ -24,24 +24,49 @@ public class MainApp {
 
 	static final org.slf4j.Logger log = org.slf4j.LoggerFactory
 			.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
-	
+
+	public static MainApp mainapp = null;
+
 	static Server server = null;
 	private int server_port = 8080;
-	
+
 	public static void main(String[] args) throws Exception {
-		new MainApp().start();
+		startService();
 	}
 
-	public void start() throws Exception {
+	/**
+	 * ใช้สำหรับ Procrun ด้วย
+	 */
+	public static void startService() {
+		try {
+			mainapp = new MainApp();
+			mainapp.startServer();
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
+	}
+
+	/**
+	 * ใช้สำหรับ Procrun
+	 */
+	public static void stopService() {
+		if (mainapp != null) {
+			mainapp.stopServer();
+			mainapp = null;
+		}
+	}
+
+	public void startServer() throws Exception {
 
 		log.info("<== Start by main method ==>");
 		FConstComm.runAppMode = 1; //มีผลกับการเชื่อมฐานข้อมูล
-		
+
 		var threadPool = new QueuedThreadPool();
 		//กำหนดให้ทำงานแบบ Virtual Threads
 		//threadPool.setVirtualThreadsExecutor(Executors.newVirtualThreadPerTaskExecutor());
 		// สามารถกำหนดชื่อ prefix ของ Virtual Threads ได้เพื่อการ Debug
-		threadPool.setVirtualThreadsExecutor(Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("jetty-vt-", 0).factory()));
+		threadPool.setVirtualThreadsExecutor(
+				Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("jetty-vt-", 0).factory()));
 
 		server = new Server(threadPool);
 
@@ -53,7 +78,7 @@ public class MainApp {
 		// ==== แบบใช้ WebAppContext ต้องเพิ่ม lib = jetty-webapp
 		var webapp = new WebAppContext();
 		webapp.setContextPath("/"); // อยู่ใน root เลย
-		
+
 		java.net.URL rscURL = MainApp.class.getResource("/webapp/");
 		log.info("webResource.toExternalForm : " + rscURL.toExternalForm());
 		//รันด้วย .jar 
@@ -61,12 +86,12 @@ public class MainApp {
 		//
 		//รันด้วย IDE 
 		//webResource.toExternalForm : file:/D:/pccsoft12Jetty12/pccsoft12Jetty12/startApp/target/classes/webapp/
-		
+
 		//org.eclipse.jetty.util.resource.Resource baseResource = org.eclipse.jetty.util.resource.ResourceFactory.of(webapp).newResource(rscURL.toURI());
 		//System.out.println("Using BaseResource: " + baseResource);
 		//webapp.setBaseResource(baseResource);
 		webapp.setBaseResourceAsString(rscURL.toExternalForm());//ใช้แบบนี้ jetty ไม่เตือนว่า feature resource จะไม่รองรับในอนาคต
-		
+
 		webapp.setContextPath("/");
 		webapp.setWelcomeFiles(new String[] { "index.html" });
 		webapp.setParentLoaderPriority(true);
@@ -97,20 +122,22 @@ public class MainApp {
 		//============= เพิ่มเข้า handlers
 		server.setHandler(webapp);
 
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-			try {
-				// ใช้เวลาหยุดเซิร์ฟเวอร์
-				server.setStopTimeout(60 * 1000l);// รอ 60 นาทีก่อนจะบังคับปิด
-				server.stop();
-				log.info("Jetty server stopped gracefully");
-			} catch (Exception e) {
-				log.error(e.getMessage(), e);
-			}
-		}));
+		Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer()));
 
 		server.start();
 		server.join();
 
+	}
+
+	public void stopServer() {
+		try {
+			// ใช้เวลาหยุดเซิร์ฟเวอร์
+			server.setStopTimeout(60 * 1000l);// รอ 60 นาทีก่อนจะบังคับปิด
+			server.stop();
+			log.info("Jetty server stopped gracefully");
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 }
