@@ -132,6 +132,7 @@ public class MainApp {
 	public void stopServer() {
 		try {
 			// ใช้เวลาหยุดเซิร์ฟเวอร์
+			log.info("initial stop gracefully");
 			server.setStopTimeout(60 * 1000l);// รอ 60 นาทีก่อนจะบังคับปิด
 			server.stop();
 			log.info("Jetty server stopped gracefully");
