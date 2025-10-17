@@ -31,13 +31,14 @@ public class MainApp {
 	private int server_port = 8080;
 
 	public static void main(String[] args) throws Exception {
-		startService();
+		startService(args);
 	}
 
 	/**
 	 * ใช้สำหรับ Procrun ด้วย
+	 * @param args
 	 */
-	public static void startService() {
+	public static void startService(String[] args) {
 		try {
 			mainapp = new MainApp();
 			mainapp.startServer();
@@ -48,8 +49,9 @@ public class MainApp {
 
 	/**
 	 * ใช้สำหรับ Procrun
+	 * @param args
 	 */
-	public static void stopService() {
+	public static void stopService(String[] args) {
 		if (mainapp != null) {
 			mainapp.stopServer();
 			mainapp = null;
