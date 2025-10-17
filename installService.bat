@@ -46,7 +46,8 @@ echo Installing %SERVICE_NAME% ...
   --LogPrefix=%SERVICE_NAME% ^
   --StdOutput=auto ^
   --StdError=auto ^
-  --JvmOptions=-Xms256m;-Xmx512m
+  --JvmOptions=-Xms256m;-Xmx512m ^
+  --PidFile=pccsoft_id
 
 echo.
 echo Service installation complete.

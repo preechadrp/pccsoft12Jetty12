@@ -54,7 +54,6 @@ public class MainApp {
 	public static void stopService(String[] args) {
 		if (mainapp != null) {
 			mainapp.stopServer();
-			mainapp = null;
 		}
 	}
 
@@ -134,8 +133,8 @@ public class MainApp {
 	public void stopServer() {
 		try {
 			// ใช้เวลาหยุดเซิร์ฟเวอร์
-			log.info("initial stop gracefully");
-			server.setStopTimeout(60 * 1000l);// รอ 60 นาทีก่อนจะบังคับปิด
+			log.info("initial stop");
+			server.setStopTimeout(30000l);// รอ 30 นาทีก่อนจะบังคับปิด
 			server.stop();
 			log.info("Jetty server stopped gracefully");
 		} catch (Exception e) {
