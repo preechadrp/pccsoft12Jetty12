@@ -41,6 +41,7 @@ echo Installing %SERVICE_NAME% ...
   --StopMode=jvm ^
   --StopClass="%STOPCLASS%" ^
   --StopMethod=%STOPMETHOD% ^
+  --StopTimeout=30 ^
   --LogPath="%LOG_PATH%" ^
   --LogPrefix=%SERVICE_NAME% ^
   --StdOutput=auto ^
