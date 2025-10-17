@@ -31,7 +31,12 @@ public class MainApp {
 	private int server_port = 8080;
 
 	public static void main(String[] args) throws Exception {
-		startService(args);
+		try {
+			mainapp = new MainApp();
+			mainapp.startServer(true);
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -41,7 +46,7 @@ public class MainApp {
 	public static void startService(String[] args) {
 		try {
 			mainapp = new MainApp();
-			mainapp.startServer();
+			mainapp.startServer(false);
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
@@ -57,7 +62,7 @@ public class MainApp {
 		}
 	}
 
-	public void startServer() throws Exception {
+	public void startServer(boolean useMainMethod) throws Exception {
 
 		log.info("<== Start by main method ==>");
 		FConstComm.runAppMode = 1; //มีผลกับการเชื่อมฐานข้อมูล
@@ -123,7 +128,9 @@ public class MainApp {
 		//============= เพิ่มเข้า handlers
 		server.setHandler(webapp);
 
-		Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer()));
+		if (useMainMethod) {
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer()));
+		}
 
 		server.start();
 		server.join();
@@ -133,10 +140,10 @@ public class MainApp {
 	public void stopServer() {
 		try {
 			// ใช้เวลาหยุดเซิร์ฟเวอร์
-			log.info("initial stop");
-			server.setStopTimeout(30000l);// รอ 30 นาทีก่อนจะบังคับปิด
+			log.info("Initiating Jetty Graceful Shutdown...");
+			server.setStopTimeout(5000l);// รอ 5 นาทีก่อนจะบังคับปิด
 			server.stop();
-			log.info("Jetty server stopped gracefully");
+			log.info("Jetty server stopped successfully.");
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
