@@ -1,3 +1,4 @@
+::install as windows service by apache procrun (prunsrv.exe rename to pccsoft.exe)
 @echo off
 setlocal enabledelayedexpansion
 
@@ -41,7 +42,7 @@ echo Installing %SERVICE_NAME% ...
   --StopMode=jvm ^
   --StopClass="%STOPCLASS%" ^
   --StopMethod=%STOPMETHOD% ^
-  --StopTimeout=10 ^
+  --StopTimeout=1000 ^
   --LogPath="%LOG_PATH%" ^
   --LogPrefix=%SERVICE_NAME% ^
   --StdOutput=auto ^

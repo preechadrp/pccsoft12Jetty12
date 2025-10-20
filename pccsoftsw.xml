@@ -1,0 +1,20 @@
+<!-- config for WinSW , rename winsw.exe to pccsoftsw.exe and same xml name-->
+<service>
+    <id>pccsoft</id>
+    <name>PCC Soft Jetty App</name>
+    <description>Your Jetty web application running as a Windows service.</description>
+
+    <logpath>%BASE%\logs</logpath>
+    <log mode="roll-by-size-time">
+        <sizeThreshold>10240</sizeThreshold> 
+		<pattern>yyyyMMdd</pattern>
+        <autoRollAtTime>00:00:00</autoRollAtTime>
+    </log>
+
+    <executable>"%BASE%\jre21\bin\java.exe"</executable>
+    <arguments>-Xrs -Xmx512m -jar "%BASE%\startApp-0.0.1.jar"</arguments>
+       
+    <shutdownTimeout>30000ms</shutdownTimeout> 
+
+    <stopparentprocessfirst>false</stopparentprocessfirst>
+</service>

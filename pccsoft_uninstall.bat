@@ -1,3 +1,4 @@
+::remove windows service by apache procrun (prunsrv.exe rename to pccsoft.exe)
 @echo off
 setlocal enabledelayedexpansion
 
