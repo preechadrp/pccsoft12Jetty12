@@ -129,7 +129,7 @@ public class MainApp {
 		server.setHandler(webapp);
 
 		if (useMainMethod) {
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer()));
+			Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer()));//XXX
 		}
 
 		server.start();
