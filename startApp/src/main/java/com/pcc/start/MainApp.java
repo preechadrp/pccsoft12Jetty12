@@ -7,6 +7,7 @@ import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.util.component.LifeCycle;
 import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.pcc.IndexServlet;
@@ -22,55 +23,25 @@ import jakarta.servlet.DispatcherType;
 
 public class MainApp {
 
-	static final org.slf4j.Logger log = org.slf4j.LoggerFactory
-			.getLogger(Thread.currentThread().getStackTrace()[1].getClassName());
-
-	public static MainApp mainapp = null;
+	static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MainApp.class);
 
 	static Server server = null;
 	private int server_port = 8080;
 
 	public static void main(String[] args) throws Exception {
 		try {
-			mainapp = new MainApp();
-			mainapp.startServer(true);
+			new MainApp().startServer();
 		} catch (Exception e) {
 			log.error(e.getMessage(), e);
 		}
 	}
 
-	/**
-	 * ใช้สำหรับ Procrun ด้วย
-	 * @param args
-	 */
-	public static void startService(String[] args) {
-		try {
-			mainapp = new MainApp();
-			mainapp.startServer(false);
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
-	}
-
-	/**
-	 * ใช้สำหรับ Procrun
-	 * @param args
-	 */
-	public static void stopService(String[] args) {
-		if (mainapp != null) {
-			mainapp.stopServer();
-		}
-	}
-
-	public void startServer(boolean useMainMethod) throws Exception {
+	public void startServer() throws Exception {
 
 		log.info("<== Start by main method ==>");
 		FConstComm.runAppMode = 1; //มีผลกับการเชื่อมฐานข้อมูล
 
 		var threadPool = new QueuedThreadPool();
-		//กำหนดให้ทำงานแบบ Virtual Threads
-		//threadPool.setVirtualThreadsExecutor(Executors.newVirtualThreadPerTaskExecutor());
-		// สามารถกำหนดชื่อ prefix ของ Virtual Threads ได้เพื่อการ Debug
 		threadPool.setVirtualThreadsExecutor(
 				Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("jetty-vt-", 0).factory()));
 
@@ -87,15 +58,6 @@ public class MainApp {
 
 		java.net.URL rscURL = MainApp.class.getResource("/webapp/");
 		log.info("webResource.toExternalForm : " + rscURL.toExternalForm());
-		//รันด้วย .jar 
-		//webResource.toExternalForm : jar:file:/D:/pccsoft12Jetty12/pccsoft12Jetty12/startApp/target/startApp-0.0.1.jar!/webapp/
-		//
-		//รันด้วย IDE 
-		//webResource.toExternalForm : file:/D:/pccsoft12Jetty12/pccsoft12Jetty12/startApp/target/classes/webapp/
-
-		//org.eclipse.jetty.util.resource.Resource baseResource = org.eclipse.jetty.util.resource.ResourceFactory.of(webapp).newResource(rscURL.toURI());
-		//System.out.println("Using BaseResource: " + baseResource);
-		//webapp.setBaseResource(baseResource);
 		webapp.setBaseResourceAsString(rscURL.toExternalForm());//ใช้แบบนี้ jetty ไม่เตือนว่า feature resource จะไม่รองรับในอนาคต
 
 		webapp.setContextPath("/");
@@ -127,26 +89,23 @@ public class MainApp {
 
 		//============= เพิ่มเข้า handlers
 		server.setHandler(webapp);
-
-		if (useMainMethod) {
-			Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer()));//XXX
-		}
+		
+		server.setStopTimeout(60000);
+		server.setStopAtShutdown(true);
+		server.addEventListener(new LifeCycle.Listener() {
+			@Override
+			public void lifeCycleStopping(LifeCycle event) {
+				log.info("Jetty is stopping gracefully");
+			}
+			@Override
+			public void lifeCycleStopped(LifeCycle event) {
+				log.info("Jetty fully stopped");
+			}
+		});
 
 		server.start();
 		server.join();
 
-	}
-
-	public void stopServer() {
-		try {
-			// ใช้เวลาหยุดเซิร์ฟเวอร์
-			log.info("Initiating Jetty Graceful Shutdown...");
-			server.setStopTimeout(5000l);// รอ 5 นาทีก่อนจะบังคับปิด
-			server.stop();
-			log.info("Jetty server stopped successfully.");
-		} catch (Exception e) {
-			log.error(e.getMessage(), e);
-		}
 	}
 
 }
