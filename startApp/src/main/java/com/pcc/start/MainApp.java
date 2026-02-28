@@ -95,11 +95,11 @@ public class MainApp {
 		server.addEventListener(new LifeCycle.Listener() {
 			@Override
 			public void lifeCycleStopping(LifeCycle event) {
-				log.info("Jetty is stopping gracefully");
+				log.info("Service is stopping gracefully");
 			}
 			@Override
 			public void lifeCycleStopped(LifeCycle event) {
-				log.info("Jetty fully stopped");
+				log.info("Service fully stopped");
 			}
 		});
 
