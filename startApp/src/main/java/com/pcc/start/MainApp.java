@@ -90,6 +90,7 @@ public class MainApp {
 		//============= เพิ่มเข้า handlers
 		server.setHandler(webapp);
 		
+		//============= อื่นๆ
 		server.setStopTimeout(60000);
 		server.setStopAtShutdown(true);
 		server.addEventListener(new LifeCycle.Listener() {
@@ -102,7 +103,6 @@ public class MainApp {
 				log.info("Service fully stopped");
 			}
 		});
-
 		server.start();
 		server.join();
 
