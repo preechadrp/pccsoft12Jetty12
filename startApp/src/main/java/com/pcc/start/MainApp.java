@@ -25,7 +25,7 @@ public class MainApp {
 
 	static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(MainApp.class);
 
-	static Server server = null;
+	private Server server = null;
 	private int server_port = 8080;
 
 	public static void main(String[] args) throws Exception {
