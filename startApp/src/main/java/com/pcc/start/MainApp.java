@@ -8,7 +8,7 @@ import org.eclipse.jetty.ee10.webapp.WebAppContext;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.util.component.LifeCycle;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.util.thread.VirtualThreadPool;
 
 import com.pcc.IndexServlet;
 import com.pcc.LoginServlet;
@@ -41,7 +41,7 @@ public class MainApp {
 		log.info("<== Start by main method ==>");
 		FConstComm.runAppMode = 1; //มีผลกับการเชื่อมฐานข้อมูล
 
-		var threadPool = new QueuedThreadPool();
+		var threadPool = new VirtualThreadPool();
 		threadPool.setVirtualThreadsExecutor(
 				Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("jetty-vt-", 0).factory()));
 
